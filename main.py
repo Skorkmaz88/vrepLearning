@@ -4,6 +4,8 @@ import time
 import sys
 import numpy as np
 from skimage import data
+import matplotlib.pyplot as plt
+from skimage import io, exposure, img_as_uint, img_as_float
 
 print "Running the script.."
 vrep.simxFinish(-1) # Close it all
@@ -33,6 +35,14 @@ if clientID!=-1:
         err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
         if err == vrep.simx_return_ok:
             print resolution
+            im = np.array(image, dtype=np.uint8)
+            im.resize(480,640,3)
+            #im = img_as_uint(im)
+
+            io.imsave('depth.png', im)
+
+            plt.imshow(im)
+            plt.show()
             vrep.simxSetVisionSensorImage(clientID, kinectDepth, image, 0, vrep.simx_opmode_oneshot)
         elif err == vrep.simx_return_novalue_flag:
             print "no image yet"
