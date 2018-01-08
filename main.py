@@ -2,6 +2,8 @@
 import vrep
 import time
 import sys
+import numpy as np
+from skimage import data
 
 print "Running the script.."
 vrep.simxFinish(-1) # Close it all
@@ -28,6 +30,9 @@ if clientID!=-1:
             input('Press <enter> key to step the simulation!')
         else:
             raw_input('Press <enter> key to step the simulation!')
+        err, resolution, image = vrep.simxGetVisionSensorImage(clientID, kinectDepth, 0, vrep.simx_opmode_buffer)
+        img = np.array(image,dtype=np.uint8)
+        print img.shape
         vrep.simxSynchronousTrigger(clientID);
 
     # stop the simulation:
