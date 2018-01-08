@@ -30,9 +30,17 @@ if clientID!=-1:
             input('Press <enter> key to step the simulation!')
         else:
             raw_input('Press <enter> key to step the simulation!')
-        err, resolution, image = vrep.simxGetVisionSensorImage(clientID, kinectDepth, 0, vrep.simx_opmode_buffer)
-        img = np.array(image,dtype=np.uint8)
-        print img.shape
+        err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
+        if err == vrep.simx_return_ok:
+            print resolution
+            vrep.simxSetVisionSensorImage(clientID, kinectDepth, image, 0, vrep.simx_opmode_oneshot)
+        elif err == vrep.simx_return_novalue_flag:
+            print "no image yet"
+            pass
+        else:
+            print err
+
+        print errorCodeKinectRGB
         vrep.simxSynchronousTrigger(clientID);
 
     # stop the simulation:
