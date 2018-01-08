@@ -13,6 +13,8 @@ if clientID!=-1:
     # start the simulation:
     vrep.simxStartSimulation(clientID,vrep.simx_opmode_blocking)
     # Connect to kinect sensor
+    errorCodeKinectRGB,kinectRGB=vrep.simxGetObjectHandle(clientID,'kinect_rgb',vrep.simx_opmode_oneshot_wait)
+    errorCodeKinectDepth,kinectDepth=vrep.simxGetObjectHandle(clientID,'kinect_depth',vrep.simx_opmode_oneshot_wait)
 
     # Connect to robotic arm
     _, handle = vrep.simxGetObjectHandle(clientID, 'UR5_joint1', vrep.simx_opmode_oneshot)
