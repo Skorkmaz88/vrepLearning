@@ -7,6 +7,7 @@ from skimage import data
 import matplotlib.pyplot as plt
 from skimage import io, exposure, img_as_uint, img_as_float
 import pickle
+import time
 
 
 # Sample
@@ -22,10 +23,11 @@ def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 0.0, sigma = 0.3):
 n_samples = 100
 # Create n number of frames, for sequence for one angle
 interpolation_steps = 4
-# Create samples
-angle_list = sampleAngles()
+# Create samples ?
+#angle_list = sampleAngles()
 
-
+# or read pickle ?
+angle_list = pickle.load('angles.pkl')
 
 print "Running the script.."
 vrep.simxFinish(-1) # Close it all
@@ -51,30 +53,31 @@ if clientID!=-1:
     _, handle4 = vrep.simxGetObjectHandle(clientID, 'UR5_joint4', vrep.simx_opmode_blocking)
 
 
-    # Now step a few times:
-    for i in range(1,n_samples):
+    # First step image goes to vein :) So wait for it ..
+    for i in range(n_samples + 1):
 
-        #if sys.version_info[0] == 3:
-        #    input('Press <enter> key to step the simulation!')
-        #else:
-        #    raw_input('Press <enter> key to step the simulation!')
 
-        joint_angles = angle_list[i]
         # Interpolate here
 
         for j in range(4):
+            if i == 0:
+                print 'Skipping the first step'
+                continue
+            else:
+                joint_angles = angle_list[i - 1]
             # Interpolate here
             angle_0 = (joint_angles[0] /  (interpolation_steps)  ) * (j + 1)
             angle_1 = (joint_angles[1] /  (interpolation_steps)  ) * (j + 1)
             angle_2 = (joint_angles[2] /  (interpolation_steps)  ) * (j + 1)
             angle_3 = (joint_angles[3] /  (interpolation_steps)  ) * (j + 1)
-            print angle_0
 
 
             vrep.simxSetJointTargetPosition(clientID, handle, angle_0,  vrep.simx_opmode_oneshot )
             vrep.simxSetJointTargetPosition(clientID, handle2, angle_1,  vrep.simx_opmode_oneshot)
             vrep.simxSetJointTargetPosition(clientID, handle3, angle_2,  vrep.simx_opmode_oneshot )
             vrep.simxSetJointTargetPosition(clientID, handle4, angle_3,  vrep.simx_opmode_oneshot )
+            # Wait for the motion
+            time.sleep(2)
             err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
 
             if err == vrep.simx_return_ok:
@@ -82,10 +85,8 @@ if clientID!=-1:
                 im.resize(480,640,3)
 
 
-                io.imsave('depth.png', im)
-                # Plot image
-                plt.imshow(im)
-                plt.show()
+                io.imsave('depth_' + str(i) +'_' + str(j)+ ' .png', im)
+
 
             elif err == vrep.simx_return_novalue_flag:
                 print "no image yet"
