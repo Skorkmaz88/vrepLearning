@@ -27,7 +27,8 @@ interpolation_steps = 4
 #angle_list = sampleAngles()
 
 # or read pickle ?
-angle_list = pickle.load('angles.pkl')
+with open('angles.pkl', 'r') as f:
+    angle_list = pickle.load(f)
 
 print "Running the script.."
 vrep.simxFinish(-1) # Close it all
