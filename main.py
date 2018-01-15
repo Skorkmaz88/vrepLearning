@@ -50,10 +50,6 @@ if clientID!=-1:
     _, handle3 = vrep.simxGetObjectHandle(clientID, 'UR5_joint3', vrep.simx_opmode_blocking)
     _, handle4 = vrep.simxGetObjectHandle(clientID, 'UR5_joint4', vrep.simx_opmode_blocking)
 
-    vrep.simxSetJointTargetVelocity(clientID, handle, 1.0, vrep.simx_opmode_oneshot)
-    vrep.simxSetJointTargetVelocity(clientID, handle2, 1.0, vrep.simx_opmode_oneshot)
-    vrep.simxSetJointTargetVelocity(clientID, handle3, 1.0, vrep.simx_opmode_oneshot)
-    vrep.simxSetJointTargetVelocity(clientID, handle4, 1.0, vrep.simx_opmode_oneshot)
 
     # Now step a few times:
     for i in range(1,n_samples):
@@ -63,34 +59,38 @@ if clientID!=-1:
         #else:
         #    raw_input('Press <enter> key to step the simulation!')
 
-
+        joint_angles = angle_list[i]
         for j in range(4):
-            joint_angles = angle_list[i]
-            print joint_angles
-            vrep.simxSetJointPosition(clientID, handle, joint_angles[0],  vrep.simx_opmode_oneshot )
-            vrep.simxSetJointPosition(clientID, handle2, joint_angles[1],  vrep.simx_opmode_oneshot )
-            vrep.simxSetJointPosition(clientID, handle3, joint_angles[2],  vrep.simx_opmode_oneshot )
-            vrep.simxSetJointPosition(clientID, handle4, joint_angles[3],  vrep.simx_opmode_oneshot )
+            # Interpolate here
+            angle_0 = (joint_angles[0] /  (4.0)  ) * (j + 1)
+            angle_1 = (joint_angles[1] /  (4.0)  ) * (j + 1)
+            angle_2 = (joint_angles[2] /  (4.0)  ) * (j + 1)
+            angle_3 = (joint_angles[3] /  (4.0)  ) * (j + 1)
+            print angle_0
+
+            vrep.simxSetJointPosition(clientID, handle, angle_0,  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointPosition(clientID, handle2, angle_1,  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointPosition(clientID, handle3, angle_2,  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointPosition(clientID, handle4, angle_3,  vrep.simx_opmode_oneshot )
             err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
 
-        if err == vrep.simx_return_ok:
-            print resolution
-            im = np.array(image, dtype=np.uint8)
-            im.resize(480,640,3)
-            #im = img_as_uint(im)
+            if err == vrep.simx_return_ok:
+                im = np.array(image, dtype=np.uint8)
+                im.resize(480,640,3)
 
-            io.imsave('depth.png', im)
 
-            plt.imshow(im)
-            plt.show()
-            vrep.simxSetVisionSensorImage(clientID, kinectDepth, image, 0, vrep.simx_opmode_oneshot)
-        elif err == vrep.simx_return_novalue_flag:
-            print "no image yet"
-            pass
-        else:
-            print err
+                io.imsave('depth.png', im)
+                # Plot image
+                plt.imshow(im)
+                plt.show()
 
-        print errorCodeKinectRGB
+            elif err == vrep.simx_return_novalue_flag:
+                print "no image yet"
+                pass
+            else:
+                print err
+
+
         vrep.simxSynchronousTrigger(clientID);
 
     # stop the simulation:
