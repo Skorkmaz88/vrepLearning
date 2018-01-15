@@ -10,21 +10,21 @@ import pickle
 
 
 # Sample
-def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 30.0, sigma = 15.0):
-    angleList = []
+def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 15.0, sigma = 7.5):
+    angle_list = []
     for i in range(n_samples):
-        angleList.append(np.random.normal(mu, sigma, num_of_joints))
+        angle_list.append(np.random.normal(mu, sigma, num_of_joints))
     with open('angles.pkl', 'wb') as f:
-        pickle.dump(angleList, f)
-    return angleList
+        pickle.dump(angle_list, f)
+    return angle_list
 
 
 n_samples = 10000
 # Create n number of frames, for sequence for one angle
 interpolation_steps = 4
 # Create samples
-angleList = sampleAngles()
-print len(angleList)
+angle_list = sampleAngles()
+
 
 
 print "Running the script.."
@@ -57,11 +57,15 @@ if clientID!=-1:
         #    input('Press <enter> key to step the simulation!')
         #else:
         #    raw_input('Press <enter> key to step the simulation!')
-        print angleList[i]
 
 
         for j in range(4):
-
+            joint_angles = angle_list[i]
+            print joint_angles
+            vrep.simxSetJointPosition(clientID, handle, joint_angles[0],  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointPosition(clientID, handle2, joint_angles[1],  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointPosition(clientID, handle3, joint_angles[2],  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointPosition(clientID, handle4, joint_angles[3],  vrep.simx_opmode_oneshot )
             err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
 
         if err == vrep.simx_return_ok:
