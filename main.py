@@ -10,22 +10,27 @@ import pickle
 
 
 # Sample
-def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 0.0, sigma = 22.5):
+def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 30.0, sigma = 15.0):
     angleList = []
-    for i in range(num_of_joints):
-        angleList.append(np.random.normal(mu, sigma, n_samples))
+    for i in range(n_samples):
+        angleList.append(np.random.normal(mu, sigma, num_of_joints))
     with open('angles.pkl', 'wb') as f:
         pickle.dump(angleList, f)
+    return angleList
 
 
+n_samples = 10000
+# Create n number of frames, for sequence for one angle
+interpolation_steps = 4
 # Create samples
-sampleAngles()
-
+angleList = sampleAngles()
+print len(angleList)
 
 
 print "Running the script.."
 vrep.simxFinish(-1) # Close it all
 clientID=vrep.simxStart('127.0.0.1',19997,True,True,5000,5) # Connect to V-REP
+
 
 
 
@@ -39,19 +44,26 @@ if clientID!=-1:
     errorCodeKinectRGB,kinectRGB=vrep.simxGetObjectHandle(clientID,'kinect_rgb',vrep.simx_opmode_oneshot_wait)
     errorCodeKinectDepth,kinectDepth=vrep.simxGetObjectHandle(clientID,'kinect_depth',vrep.simx_opmode_oneshot_wait)
 
-    # Connect to robotic arm
+    # Connect to robotic arm, we use 4 angles, if you use a differenct scene check joint  names
     _, handle = vrep.simxGetObjectHandle(clientID, 'UR5_joint1', vrep.simx_opmode_oneshot)
     _, handle2 = vrep.simxGetObjectHandle(clientID, 'UR5_joint2', vrep.simx_opmode_oneshot)
     _, handle3 = vrep.simxGetObjectHandle(clientID, 'UR5_joint3', vrep.simx_opmode_oneshot)
     _, handle4 = vrep.simxGetObjectHandle(clientID, 'UR5_joint4', vrep.simx_opmode_oneshot)
 
     # Now step a few times:
-    for i in range(1,3):
-        if sys.version_info[0] == 3:
-            input('Press <enter> key to step the simulation!')
-        else:
-            raw_input('Press <enter> key to step the simulation!')
-        err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
+    for i in range(1,n_samples):
+
+        #if sys.version_info[0] == 3:
+        #    input('Press <enter> key to step the simulation!')
+        #else:
+        #    raw_input('Press <enter> key to step the simulation!')
+        print angleList[i]
+
+
+        for j in range(4):
+
+            err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
+
         if err == vrep.simx_return_ok:
             print resolution
             im = np.array(image, dtype=np.uint8)
