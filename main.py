@@ -6,10 +6,29 @@ import numpy as np
 from skimage import data
 import matplotlib.pyplot as plt
 from skimage import io, exposure, img_as_uint, img_as_float
+import pickle
+
+
+# Sample
+def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 0.0, sigma = 22.5):
+    angleList = []
+    for i in range(num_of_joints):
+        angleList.append(np.random.normal(mu, sigma, n_samples))
+    with open('angles.pkl', 'wb') as f:
+        pickle.dump(angleList, f)
+
+
+# Create samples
+sampleAngles()
+
+
 
 print "Running the script.."
 vrep.simxFinish(-1) # Close it all
 clientID=vrep.simxStart('127.0.0.1',19997,True,True,5000,5) # Connect to V-REP
+
+
+
 
 if clientID!=-1:
     # enable the synchronous mode on the client:
@@ -27,7 +46,7 @@ if clientID!=-1:
     _, handle4 = vrep.simxGetObjectHandle(clientID, 'UR5_joint4', vrep.simx_opmode_oneshot)
 
     # Now step a few times:
-    for i in range(1,10):
+    for i in range(1,3):
         if sys.version_info[0] == 3:
             input('Press <enter> key to step the simulation!')
         else:
