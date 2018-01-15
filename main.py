@@ -19,7 +19,7 @@ def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 15.0, sigma = 7.5):
     return angle_list
 
 
-n_samples = 10000
+n_samples = 5
 # Create n number of frames, for sequence for one angle
 interpolation_steps = 4
 # Create samples
@@ -45,10 +45,15 @@ if clientID!=-1:
     errorCodeKinectDepth,kinectDepth=vrep.simxGetObjectHandle(clientID,'kinect_depth',vrep.simx_opmode_oneshot_wait)
 
     # Connect to robotic arm, we use 4 angles, if you use a differenct scene check joint  names
-    _, handle = vrep.simxGetObjectHandle(clientID, 'UR5_joint1', vrep.simx_opmode_oneshot)
-    _, handle2 = vrep.simxGetObjectHandle(clientID, 'UR5_joint2', vrep.simx_opmode_oneshot)
-    _, handle3 = vrep.simxGetObjectHandle(clientID, 'UR5_joint3', vrep.simx_opmode_oneshot)
-    _, handle4 = vrep.simxGetObjectHandle(clientID, 'UR5_joint4', vrep.simx_opmode_oneshot)
+    _, handle = vrep.simxGetObjectHandle(clientID, 'UR5_joint1', vrep.simx_opmode_blocking)
+    _, handle2 = vrep.simxGetObjectHandle(clientID, 'UR5_joint2', vrep.simx_opmode_blocking)
+    _, handle3 = vrep.simxGetObjectHandle(clientID, 'UR5_joint3', vrep.simx_opmode_blocking)
+    _, handle4 = vrep.simxGetObjectHandle(clientID, 'UR5_joint4', vrep.simx_opmode_blocking)
+
+    vrep.simxSetJointTargetVelocity(clientID, handle, 1.0, vrep.simx_opmode_oneshot)
+    vrep.simxSetJointTargetVelocity(clientID, handle2, 1.0, vrep.simx_opmode_oneshot)
+    vrep.simxSetJointTargetVelocity(clientID, handle3, 1.0, vrep.simx_opmode_oneshot)
+    vrep.simxSetJointTargetVelocity(clientID, handle4, 1.0, vrep.simx_opmode_oneshot)
 
     # Now step a few times:
     for i in range(1,n_samples):
