@@ -64,10 +64,10 @@ if clientID!=-1:
 
         for j in range(4):
             # Interpolate here
-            angle_0 = (joint_angles[0] /  (interpolation_steps)  ) * (j + 1) * 50
-            angle_1 = (joint_angles[1] /  (interpolation_steps)  ) * (j + 1) * 50
-            angle_2 = (joint_angles[2] /  (interpolation_steps)  ) * (j + 1) * 50
-            angle_3 = (joint_angles[3] /  (interpolation_steps)  ) * (j + 1) * 50
+            angle_0 = (joint_angles[0] /  (interpolation_steps)  ) * (j + 1)
+            angle_1 = (joint_angles[1] /  (interpolation_steps)  ) * (j + 1)
+            angle_2 = (joint_angles[2] /  (interpolation_steps)  ) * (j + 1)
+            angle_3 = (joint_angles[3] /  (interpolation_steps)  ) * (j + 1)
             print angle_0
 
 
@@ -93,7 +93,7 @@ if clientID!=-1:
             else:
                 print err
 
-        vrep.simxSynchronousTrigger(clientID);
+            vrep.simxSynchronousTrigger(clientID);
 
     # stop the simulation:
     vrep.simxStopSimulation(clientID,vrep.simx_opmode_blocking)
