@@ -20,8 +20,8 @@ def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 0.0, sigma = 15.0):
         pickle.dump(angle_list, f)
     return angle_list
 
-
-n_samples = 100
+# I had a black first image at first even though there was an image
+n_samples = 10001
 # Create n number of frames, for sequence for one angle
 interpolation_steps = 4
 # Create samples ?
@@ -35,6 +35,8 @@ print "Running the script.."
 vrep.simxFinish(-1) # Close it all
 clientID=vrep.simxStart('127.0.0.1',19997,True,True,5000,5) # Connect to V-REP
 
+# Save observed angles
+lst_observed = []
 
 
 
@@ -81,9 +83,19 @@ if clientID!=-1:
             vrep.simxSetJointTargetPosition(clientID, handle2, math.radians(angle_1),  vrep.simx_opmode_oneshot)
             vrep.simxSetJointTargetPosition(clientID, handle3, math.radians(angle_2),  vrep.simx_opmode_oneshot )
             vrep.simxSetJointTargetPosition(clientID, handle4, math.radians(angle_3),  vrep.simx_opmode_oneshot )
-            # Wait for the motion
-            time.sleep(2)
+            vrep.simxPauseCommunication(clientID,True)
+            lst_sample = []
             err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
+  	    samp_angle_0 = vrep.simxGetJointPosition(clientID,handle, vrep.simx_opmode_oneshot)		
+            samp_angle_1 = vrep.simxGetJointPosition(clientID,handle2, vrep.simx_opmode_oneshot)
+            samp_angle_2 = vrep.simxGetJointPosition(clientID,handle3, vrep.simx_opmode_oneshot)
+            samp_angle_3 = vrep.simxGetJointPosition(clientID,handle4, vrep.simx_opmode_oneshot)
+            lst_sample.append(samp_angle_0)
+            lst_sample.append(samp_angle_1)
+            lst_sample.append(samp_angle_2)
+            lst_sample.append(samp_angle_3)
+            lst_observed.append(lst_sample)
+            vrep.simxPauseCommunication(clientID,False)
 
             if err == vrep.simx_return_ok:
                 im = np.array(image, dtype=np.uint8)
@@ -106,6 +118,10 @@ if clientID!=-1:
 
     # Now close the connection to V-REP:
     vrep.simxFinish(clientID)
+    # Save results
+    with open('angles-observed.pkl', 'wb') as f:
+        pickle.dump(lst_observed, f)
+
 else:
     print "Couldn't connect to remote API :("
 
