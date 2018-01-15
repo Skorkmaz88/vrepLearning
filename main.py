@@ -10,7 +10,7 @@ import pickle
 
 
 # Sample
-def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 15.0, sigma = 7.5):
+def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 0.0, sigma = 0.3):
     angle_list = []
     for i in range(n_samples):
         angle_list.append(np.random.normal(mu, sigma, num_of_joints))
@@ -19,7 +19,7 @@ def sampleAngles(n_samples = 10000, num_of_joints = 4, mu = 15.0, sigma = 7.5):
     return angle_list
 
 
-n_samples = 5
+n_samples = 100
 # Create n number of frames, for sequence for one angle
 interpolation_steps = 4
 # Create samples
@@ -60,18 +60,21 @@ if clientID!=-1:
         #    raw_input('Press <enter> key to step the simulation!')
 
         joint_angles = angle_list[i]
+        # Interpolate here
+
         for j in range(4):
             # Interpolate here
-            angle_0 = (joint_angles[0] /  (4.0)  ) * (j + 1)
-            angle_1 = (joint_angles[1] /  (4.0)  ) * (j + 1)
-            angle_2 = (joint_angles[2] /  (4.0)  ) * (j + 1)
-            angle_3 = (joint_angles[3] /  (4.0)  ) * (j + 1)
+            angle_0 = (joint_angles[0] /  (interpolation_steps)  ) * (j + 1) * 50
+            angle_1 = (joint_angles[1] /  (interpolation_steps)  ) * (j + 1) * 50
+            angle_2 = (joint_angles[2] /  (interpolation_steps)  ) * (j + 1) * 50
+            angle_3 = (joint_angles[3] /  (interpolation_steps)  ) * (j + 1) * 50
             print angle_0
 
-            vrep.simxSetJointPosition(clientID, handle, angle_0,  vrep.simx_opmode_oneshot )
-            vrep.simxSetJointPosition(clientID, handle2, angle_1,  vrep.simx_opmode_oneshot )
-            vrep.simxSetJointPosition(clientID, handle3, angle_2,  vrep.simx_opmode_oneshot )
-            vrep.simxSetJointPosition(clientID, handle4, angle_3,  vrep.simx_opmode_oneshot )
+
+            vrep.simxSetJointTargetPosition(clientID, handle, angle_0,  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointTargetPosition(clientID, handle2, angle_1,  vrep.simx_opmode_oneshot)
+            vrep.simxSetJointTargetPosition(clientID, handle3, angle_2,  vrep.simx_opmode_oneshot )
+            vrep.simxSetJointTargetPosition(clientID, handle4, angle_3,  vrep.simx_opmode_oneshot )
             err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
 
             if err == vrep.simx_return_ok:
@@ -89,7 +92,6 @@ if clientID!=-1:
                 pass
             else:
                 print err
-
 
         vrep.simxSynchronousTrigger(clientID);
 
