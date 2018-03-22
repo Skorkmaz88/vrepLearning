@@ -86,7 +86,7 @@ if clientID!=-1:
             vrep.simxPauseCommunication(clientID,True)
             lst_sample = []
             err, resolution, image = vrep.simxGetVisionSensorImage(clientID,kinectDepth, 0, vrep.simx_opmode_streaming)
-  	    samp_angle_0 = vrep.simxGetJointPosition(clientID,handle, vrep.simx_opmode_oneshot)		
+  	        samp_angle_0 = vrep.simxGetJointPosition(clientID,handle, vrep.simx_opmode_oneshot)		
             samp_angle_1 = vrep.simxGetJointPosition(clientID,handle2, vrep.simx_opmode_oneshot)
             samp_angle_2 = vrep.simxGetJointPosition(clientID,handle3, vrep.simx_opmode_oneshot)
             samp_angle_3 = vrep.simxGetJointPosition(clientID,handle4, vrep.simx_opmode_oneshot)
@@ -102,7 +102,7 @@ if clientID!=-1:
                 im.resize(480,640,3)
 
 
-                io.imsave('depth_' + str(i-1) +'_' + str(j)+ ' .png', im)
+                io.imsave('depth_' + str(i-1) +'_' + str(j)+ '.png', im)
 
 
             elif err == vrep.simx_return_novalue_flag:
